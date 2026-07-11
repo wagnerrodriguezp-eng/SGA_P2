@@ -1,0 +1,24 @@
+@model ConfirmEmailViewModel
+@{
+    ViewData["Title"] = "Confirm email";
+}
+
+<h2>Confirm your email</h2>
+
+@if (ViewBag.ResultMessage is string message)
+{
+    <div class="alert @(ViewBag.Success == true ? "alert-success" : "alert-danger")">@message</div>
+}
+
+@if (ViewBag.Success != true)
+{
+    <form asp-controller="Account" asp-action="ConfirmEmail" method="post">
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="Token" />
+        <button type="submit" class="btn btn-primary">Confirm my account</button>
+    </form>
+}
+else
+{
+    <a class="btn btn-primary" asp-controller="Account" asp-action="Login">Continue to log in</a>
+}

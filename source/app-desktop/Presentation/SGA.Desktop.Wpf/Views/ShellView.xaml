@@ -1,0 +1,46 @@
+<Window x:Class="SGA.Desktop.Wpf.Views.ShellView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{materialDesign:MaterialDesignFont}"
+        Title="SGA-ITLA — Transport Administrator Console" Height="800" Width="1280"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <materialDesign:ColorZone Mode="PrimaryDark" Grid.Column="0">
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Top" Margin="16">
+                    <TextBlock Text="SGA-ITLA" FontSize="20" FontWeight="Bold" />
+                    <TextBlock Text="Transport Office" FontSize="12" Opacity="0.8" />
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="8">
+                    <TextBlock Text="{Binding CurrentUserService.CurrentUser.Identity.Name}"
+                               FontSize="12" Margin="8" TextTrimming="CharacterEllipsis" />
+                    <Button Content="LOG OUT" Command="{Binding LogoutCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}" Margin="8" />
+                </StackPanel>
+
+                <StackPanel>
+                    <Button Content="Fleet" Command="{Binding NavigateBusesCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                    <Button Content="Drivers" Command="{Binding NavigateDriversCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                    <Button Content="Routes &amp; Schedules" Command="{Binding NavigateRoutesCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                    <Button Content="Assign Trip" Command="{Binding NavigateTripAssignmentCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                    <Button Content="Trip Monitor" Command="{Binding NavigateTripMonitorCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                    <Button Content="Authorizations" Command="{Binding NavigateAuthorizationsCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                    <Button Content="Users" Command="{Binding NavigateUsersCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                    <Button Content="Reports" Command="{Binding NavigateReportsCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                    <Button Content="Audit Log" Command="{Binding NavigateAuditLogCommand}" Style="{StaticResource MaterialDesignFlatButton}" HorizontalContentAlignment="Left" Margin="4" />
+                </StackPanel>
+            </DockPanel>
+        </materialDesign:ColorZone>
+
+        <ContentControl Grid.Column="1" Content="{Binding CurrentView}" Margin="16" />
+    </Grid>
+</Window>

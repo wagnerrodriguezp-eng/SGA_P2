@@ -1,0 +1,69 @@
+<UserControl x:Class="SGA.Desktop.Wpf.Views.BusesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="320" />
+        </Grid.ColumnDefinitions>
+
+        <materialDesign:Card Grid.Column="0" Margin="0,0,8,0" Padding="16">
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <TextBlock Text="Fleet Management" FontSize="20" FontWeight="Bold" />
+                    <Button Content="NEW BUS" Command="{Binding NewCommand}" HorizontalAlignment="Right"
+                            Style="{StaticResource MaterialDesignRaisedButton}" />
+                </DockPanel>
+                <DataGrid ItemsSource="{Binding Buses}" AutoGenerateColumns="False" IsReadOnly="True"
+                          SelectedItem="{Binding SelectedBus}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Plate Number" Binding="{Binding PlateNumber}" Width="*" />
+                        <DataGridTextColumn Header="Model" Binding="{Binding Model}" Width="*" />
+                        <DataGridTextColumn Header="Year" Binding="{Binding Year}" Width="80" />
+                        <DataGridTextColumn Header="Capacity" Binding="{Binding Capacity}" Width="80" />
+                        <DataGridTextColumn Header="Status" Binding="{Binding BusStatus}" Width="120" />
+                        <DataGridTemplateColumn Header="" Width="180">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Edit" Margin="2"
+                                                Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}" />
+                                        <Button Content="Deactivate" Margin="2"
+                                                Command="{Binding DataContext.DeactivateCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </materialDesign:Card>
+
+        <materialDesign:Card Grid.Column="1" Padding="16" Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock Text="Bus details" FontSize="16" FontWeight="Bold" Margin="0,0,0,16" />
+                <TextBox Text="{Binding PlateNumber, UpdateSourceTrigger=PropertyChanged}" MaxLength="15"
+                         materialDesign:HintAssist.Hint="Plate number"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0,0,0,12" />
+                <TextBox Text="{Binding ModelName, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"
+                         materialDesign:HintAssist.Hint="Model" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0,0,0,12" />
+                <TextBox Text="{Binding Year, UpdateSourceTrigger=PropertyChanged}"
+                         materialDesign:HintAssist.Hint="Year" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0,0,0,12" />
+                <TextBox Text="{Binding Capacity, UpdateSourceTrigger=PropertyChanged}"
+                         materialDesign:HintAssist.Hint="Capacity" Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0,0,0,12" />
+                <ComboBox ItemsSource="{Binding BusStatusOptions}" SelectedItem="{Binding BusStatus}"
+                          materialDesign:HintAssist.Hint="Status" Style="{StaticResource MaterialDesignOutlinedComboBox}" Margin="0,0,0,12" />
+
+                <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource ValidationErrorBrush}" TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="SAVE" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,0,8,0" />
+                    <Button Content="CANCEL" Command="{Binding CancelEditCommand}" Style="{StaticResource MaterialDesignFlatButton}" />
+                </StackPanel>
+            </StackPanel>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

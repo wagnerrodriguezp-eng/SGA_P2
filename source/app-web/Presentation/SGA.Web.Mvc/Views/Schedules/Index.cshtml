@@ -1,0 +1,31 @@
+@model List<RouteModel>
+@{
+    ViewData["Title"] = "Routes & schedules";
+}
+
+<h2>Routes</h2>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No routes are available right now.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var route in Model)
+            {
+                <tr>
+                    <td>@route.Name</td>
+                    <td>@route.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

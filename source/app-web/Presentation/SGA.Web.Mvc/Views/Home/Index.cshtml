@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "SGA-ITLA Transport";
+}
+
+<div class="text-center py-5">
+    <h1 class="display-5">ITLA Bus Transport System</h1>
+    <p class="lead">Check your ticket or card, validate your access, and follow your assigned trips — all in one place.</p>
+
+    @if (User.Identity?.IsAuthenticated != true)
+    {
+        <a class="btn btn-primary btn-lg me-2" asp-controller="Account" asp-action="Login">Log in</a>
+        <a class="btn btn-outline-secondary btn-lg" asp-controller="Account" asp-action="Register">Create account</a>
+    }
+    else
+    {
+        <p>Welcome back, <strong>@User.Identity.Name</strong>.</p>
+        @if (User.IsInRole("Student") || User.IsInRole("Employee"))
+        {
+            <a class="btn btn-primary me-2" asp-controller="Authorizations" asp-action="Me">My authorization</a>
+            <a class="btn btn-outline-primary me-2" asp-controller="Access" asp-action="Validate">Validate access</a>
+        }
+        @if (User.IsInRole("Driver"))
+        {
+            <a class="btn btn-primary me-2" asp-controller="Driver" asp-action="AssignedTrips">My assigned trips</a>
+        }
+        <a class="btn btn-outline-secondary" asp-controller="Schedules" asp-action="Index">Routes &amp; schedules</a>
+    }
+</div>

@@ -1,0 +1,32 @@
+@model AuthorizationModel?
+@{
+    ViewData["Title"] = "My authorization";
+}
+
+<h2>My authorization</h2>
+
+@if (ViewBag.ResultMessage is string message)
+{
+    <div class="alert alert-info">@message</div>
+}
+
+@if (Model is not null)
+{
+    <dl class="row">
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">@(Model.AuthorizationType == 1 ? "Monthly Ticket" : "Rechargeable Card")</dd>
+
+        @if (Model.AuthorizationType == 1)
+        {
+            <dt class="col-sm-3">Valid from</dt>
+            <dd class="col-sm-9">@Model.StartDate.ToString("d")</dd>
+            <dt class="col-sm-3">Valid until</dt>
+            <dd class="col-sm-9">@(Model.EndDate?.ToString("d") ?? "—")</dd>
+        }
+        else
+        {
+            <dt class="col-sm-3">Remaining trips</dt>
+            <dd class="col-sm-9">@(Model.Balance ?? 0)</dd>
+        }
+    </dl>
+}

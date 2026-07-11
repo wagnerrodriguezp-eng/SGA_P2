@@ -1,0 +1,32 @@
+@model ValidateAccessViewModel
+@{
+    ViewData["Title"] = "Validate access";
+}
+
+<h2>Validate access</h2>
+
+<div class="row">
+    <div class="col-md-5">
+        <form asp-controller="Access" asp-action="Validate" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="AuthorizationIdentifier" class="form-label"></label>
+                <input asp-for="AuthorizationIdentifier" class="form-control" maxlength="20" />
+                <span asp-validation-for="AuthorizationIdentifier" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="TripId" class="form-label"></label>
+                <input asp-for="TripId" class="form-control" />
+                <span asp-validation-for="TripId" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Validate
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

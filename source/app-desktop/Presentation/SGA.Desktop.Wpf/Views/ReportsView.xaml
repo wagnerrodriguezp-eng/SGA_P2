@@ -1,0 +1,60 @@
+<UserControl x:Class="SGA.Desktop.Wpf.Views.ReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <materialDesign:Card Padding="16">
+        <StackPanel>
+            <TextBlock Text="Reports" FontSize="20" FontWeight="Bold" Margin="0,0,0,16" />
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <DatePicker SelectedDate="{Binding DateFrom}" materialDesign:HintAssist.Hint="From" Margin="0,0,8,0" />
+                <DatePicker SelectedDate="{Binding DateTo}" materialDesign:HintAssist.Hint="To" Margin="0,0,8,0" />
+                <Button Content="GENERATE" Command="{Binding GenerateCommand}" Style="{StaticResource MaterialDesignRaisedButton}" />
+            </StackPanel>
+
+            <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Margin="0,0,0,16" />
+
+            <UniformGrid Columns="2">
+                <materialDesign:Card Padding="12" Margin="4">
+                    <StackPanel>
+                        <TextBlock Text="Usage" FontWeight="Bold" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding UsageReport.TotalAttempts, StringFormat='Total attempts: {0}'}" />
+                        <TextBlock Text="{Binding UsageReport.GrantedCount, StringFormat='Granted: {0}'}" />
+                        <TextBlock Text="{Binding UsageReport.DeniedExpiredCount, StringFormat='Denied (expired): {0}'}" />
+                        <TextBlock Text="{Binding UsageReport.DeniedNoBalanceCount, StringFormat='Denied (no balance): {0}'}" />
+                        <TextBlock Text="{Binding UsageReport.DeniedNoCapacityCount, StringFormat='Denied (no capacity): {0}'}" />
+                        <TextBlock Text="{Binding UsageReport.DeniedUnauthorizedCount, StringFormat='Denied (unauthorized): {0}'}" />
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <materialDesign:Card Padding="12" Margin="4">
+                    <StackPanel>
+                        <TextBlock Text="Occupancy" FontWeight="Bold" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding OccupancyReport.TotalTrips, StringFormat='Total trips: {0}'}" />
+                        <TextBlock Text="{Binding OccupancyReport.AverageOccupancyPercentage, StringFormat='Average occupancy: {0:0.##}%'}" />
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <materialDesign:Card Padding="12" Margin="4">
+                    <StackPanel>
+                        <TextBlock Text="Punctuality" FontWeight="Bold" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding PunctualityReport.TotalTrips, StringFormat='Total trips: {0}'}" />
+                        <TextBlock Text="{Binding PunctualityReport.OnTimeCount, StringFormat='On time: {0}'}" />
+                        <TextBlock Text="{Binding PunctualityReport.DelayedCount, StringFormat='Delayed: {0}'}" />
+                        <TextBlock Text="{Binding PunctualityReport.OnTimePercentage, StringFormat='On-time rate: {0:0.##}%'}" />
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <materialDesign:Card Padding="12" Margin="4">
+                    <StackPanel>
+                        <TextBlock Text="Authorization Issuance (revenue proxy)" FontWeight="Bold" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding RevenueReport.MonthlyTicketsIssued, StringFormat='Monthly tickets issued: {0}'}" />
+                        <TextBlock Text="{Binding RevenueReport.RechargeableCardsIssued, StringFormat='Rechargeable cards issued: {0}'}" />
+                        <TextBlock Text="No currency amount is modeled in this system's schema." FontStyle="Italic" Opacity="0.7"
+                                   TextWrapping="Wrap" Margin="0,8,0,0" />
+                    </StackPanel>
+                </materialDesign:Card>
+            </UniformGrid>
+        </StackPanel>
+    </materialDesign:Card>
+</UserControl>

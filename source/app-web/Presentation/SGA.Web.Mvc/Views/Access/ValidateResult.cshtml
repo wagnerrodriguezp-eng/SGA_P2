@@ -1,0 +1,20 @@
+@model UsageRecordModel
+@{
+    ViewData["Title"] = "Access result";
+    var (badgeClass, message) = Model.AccessResult switch
+    {
+        AccessResultCode.Granted => ("alert-success", "Access granted — enjoy your trip!"),
+        AccessResultCode.DeniedExpired => ("alert-danger", "Your monthly ticket is not valid today."),
+        AccessResultCode.DeniedNoBalance => ("alert-danger", "Your card has no remaining trips — please recharge at the Transport Office."),
+        AccessResultCode.DeniedNoCapacity => ("alert-warning", "This trip has no remaining capacity. Please check the next scheduled trip."),
+        _ => ("alert-danger", "No active authorization was found for your account.")
+    };
+}
+
+<h2>Access result</h2>
+
+<div class="alert @badgeClass" role="alert">
+    @message
+</div>
+
+<a class="btn btn-outline-primary" asp-controller="Access" asp-action="Validate">Validate another trip</a>
