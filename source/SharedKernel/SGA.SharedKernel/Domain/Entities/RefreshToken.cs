@@ -11,4 +11,8 @@ public class RefreshToken : BaseEntity<Guid>
     public DateTime ExpiresAtUtc { get; set; }
     public DateTime? RevokedAtUtc { get; set; }
     public string? ReplacedByToken { get; set; }
+
+    // Backs optimistic-concurrency protection against the same token being rotated twice
+    // concurrently (see IdentityGatewayAdapter.RefreshAsync).
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 }

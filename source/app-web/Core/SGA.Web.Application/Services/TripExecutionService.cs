@@ -1,4 +1,3 @@
-using SGA.SharedKernel.Application.Persistence;
 using SGA.SharedKernel.Application.Results;
 using SGA.SharedKernel.Domain.Entities;
 using SGA.SharedKernel.Domain.Enums;
@@ -14,14 +13,14 @@ public class TripExecutionService
 {
     private readonly ITripExecutionValidator _validator;
     private readonly ITripRepository _tripRepository;
-    private readonly IGenericRepository<Incident, Guid> _incidentRepository;
+    private readonly IIncidentRepository _incidentRepository;
     private readonly IAuditWriter _auditWriter;
     private readonly INotificationSender _notificationSender;
 
     public TripExecutionService(
         ITripExecutionValidator validator,
         ITripRepository tripRepository,
-        IGenericRepository<Incident, Guid> incidentRepository,
+        IIncidentRepository incidentRepository,
         IAuditWriter auditWriter,
         INotificationSender notificationSender)
     {
@@ -107,5 +106,18 @@ public class TripExecutionService
         await _notificationSender.SendIncidentNoticeAsync(tripDescription, dto.Description, ct);
 
         return OperationResult<Incident>.Success(incident);
+    }
+
+    public async Task<OperationResult<IReadOnlyList<Incident>>> GetIncidentsForTripAsync(
+        Guid tripId, Guid driverUserId, CancellationToken ct = default)
+    {
+        var notifications = await _validator.ValidateIncidentsQueryAsync(tripId, driverUserId, ct);
+        if (notifications.HasNotifications)
+        {
+            return OperationResult<IReadOnlyList<Incident>>.Failure(OperationResultStatus.NotFound, "Trip not found.");
+        }
+
+        var incidents = await _incidentRepository.GetByTripIdAsync(tripId, ct);
+        return OperationResult<IReadOnlyList<Incident>>.Success(incidents);
     }
 }

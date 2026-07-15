@@ -1,3 +1,4 @@
+using SGA.SharedKernel.Domain.Entities;
 using SGA.Desktop.Domain.Dtos;
 using SGA.Desktop.Application.Reporting;
 
@@ -12,4 +13,7 @@ public interface IReportingRepository
     Task<OccupancyReportResult> GetOccupancyReportAsync(ReportFilterDto filter, CancellationToken ct = default);
     Task<PunctualityReportResult> GetPunctualityReportAsync(ReportFilterDto filter, CancellationToken ct = default);
     Task<RevenueReportResult> GetRevenueReportAsync(ReportFilterDto filter, CancellationToken ct = default);
+
+    // Raw drill-down behind the aggregate usage report — one UsageRecord per access attempt.
+    Task<IReadOnlyList<UsageRecord>> GetUsageRecordsAsync(ReportFilterDto filter, CancellationToken ct = default);
 }

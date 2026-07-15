@@ -15,6 +15,8 @@ public static class ApplicationDependencies
         services.AddScoped<UserManagementService>();
         services.AddScoped<ReportingService>();
         services.AddScoped<AuditQueryService>();
+        services.AddScoped<IncidentManagementService>();
+        services.AddScoped<NotificationMonitoringService>();
         return services;
     }
 }

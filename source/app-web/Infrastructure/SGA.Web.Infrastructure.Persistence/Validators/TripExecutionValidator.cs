@@ -68,6 +68,29 @@ public class TripExecutionValidator : ITripExecutionValidator
         if (trip is null)
         {
             notifications.AddNotification("NotFound", "Trip not found.");
+            return notifications;
+        }
+        if (trip.DriverUserId != reportedByUserId)
+        {
+            notifications.AddNotification("Forbidden", "This trip is not assigned to you.");
+        }
+
+        return notifications;
+    }
+
+    public async Task<NotificationContext> ValidateIncidentsQueryAsync(Guid tripId, Guid driverUserId, CancellationToken ct = default)
+    {
+        var notifications = new NotificationContext();
+        var trip = await _context.Trips.FirstOrDefaultAsync(t => t.Id == tripId, ct);
+
+        if (trip is null)
+        {
+            notifications.AddNotification("NotFound", "Trip not found.");
+            return notifications;
+        }
+        if (trip.DriverUserId != driverUserId)
+        {
+            notifications.AddNotification("Forbidden", "This trip is not assigned to you.");
         }
 
         return notifications;

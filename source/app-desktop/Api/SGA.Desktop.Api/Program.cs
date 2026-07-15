@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Polly;
 using Serilog;
 using SGA.Identity.Constants;
@@ -46,6 +47,32 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database");
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "SGA.Desktop.Api", Version = "v1" });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Paste the access token returned by POST /api/v1/auth/login."
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
 var app = builder.Build();
 
 // Startup resilience — Polly retry (3x, exponential backoff 2s/4s/8s) around the initial DB
@@ -59,7 +86,12 @@ await startupRetryPolicy.ExecuteAsync(async () =>
 {
     await using var scope = app.Services.CreateAsyncScope();
     var db = scope.ServiceProvider.GetRequiredService<DesktopAppDbContext>();
-    await db.Database.CanConnectAsync();
+    // CanConnectAsync() swallows connection failures and returns false rather than throwing —
+    // without this check, Policy.Handle<Exception>() never sees a failure to retry on.
+    if (!await db.Database.CanConnectAsync())
+    {
+        throw new InvalidOperationException("Database is not reachable yet.");
+    }
 });
 
 await TransportAdminSeeder.SeedAsync(app.Services, app.Configuration, app.Services.GetRequiredService<ILogger<Program>>());
@@ -78,6 +110,12 @@ app.UseExceptionHandler(errorApp =>
             OperationResultStatus.UnexpectedError, "An unexpected error occurred. Please try again later."));
     });
 });
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

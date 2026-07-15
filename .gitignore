@@ -4,6 +4,9 @@ obj/
 *.user
 *.suo
 
+## Except: shared multi-startup-project configuration (deliberately committed for the team)
+!SGA.sln.user
+
 ## Visual Studio
 .vs/
 

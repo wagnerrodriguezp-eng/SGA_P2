@@ -13,5 +13,6 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.Property(r => r.Token).HasMaxLength(256).IsRequired();
         builder.HasIndex(r => r.Token).IsUnique();
         builder.Property(r => r.ReplacedByToken).HasMaxLength(256);
+        builder.Property(r => r.RowVersion).IsRowVersion();
     }
 }

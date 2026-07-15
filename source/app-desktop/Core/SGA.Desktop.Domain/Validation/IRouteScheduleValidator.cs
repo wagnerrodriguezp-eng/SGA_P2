@@ -8,5 +8,6 @@ public interface IRouteScheduleValidator
     Task<NotificationContext> ValidateRouteForCreateAsync(CreateRouteDto dto, CancellationToken ct = default);
     Task<NotificationContext> ValidateRouteForUpdateAsync(Guid routeId, UpdateRouteDto dto, CancellationToken ct = default);
     Task<NotificationContext> ValidateStopForCreateAsync(CreateStopDto dto, CancellationToken ct = default);
+    Task<NotificationContext> ValidateStopForUpdateAsync(Guid stopId, UpdateStopDto dto, CancellationToken ct = default);
     Task<NotificationContext> ValidateScheduleForCreateAsync(CreateScheduleDto dto, CancellationToken ct = default);
 }

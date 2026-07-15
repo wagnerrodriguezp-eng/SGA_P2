@@ -44,4 +44,11 @@ public class TripsController : ApiControllerBase
         var result = await _tripExecutionService.ReportIncidentAsync(id, CurrentUserId, dto, ct);
         return FromResult(result);
     }
+
+    [HttpGet("{id:guid}/incidents")]
+    public async Task<IActionResult> GetIncidents(Guid id, CancellationToken ct)
+    {
+        var result = await _tripExecutionService.GetIncidentsForTripAsync(id, CurrentUserId, ct);
+        return FromResult(result);
+    }
 }

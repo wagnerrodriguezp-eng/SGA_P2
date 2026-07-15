@@ -93,9 +93,18 @@ public class AccessValidationService
             }
             catch (ConcurrencyConflictException)
             {
-                return OperationResult<UsageRecord>.Failure(
-                    OperationResultStatus.Conflict,
-                    "This trip just reached full capacity. Please check the next scheduled trip.");
+                // The failed SaveChangesAsync above left the Trip/Authorization entries tracked as
+                // Modified with a stale RowVersion. Reload them (same mechanism the retry path uses)
+                // so the denial record below doesn't also try to re-save those stale changes and
+                // throw a second, unhandled ConcurrencyConflictException.
+                await _tripRepository.GetWithConcurrencyTokenAsync(tripId, ct);
+                await _authorizationRepository.GetActiveForUserAsync(userId, ct);
+
+                var deniedRecord = await RecordUsageAsync(userId, tripId, null, AccessResult.DeniedNoCapacity, ct);
+                await _auditWriter.WriteAsync(
+                    "Access.Denied", nameof(Trip), tripId.ToString(), userId,
+                    "Trip reached full capacity after concurrent boarding attempts.", ct);
+                return OperationResult<UsageRecord>.Success(deniedRecord);
             }
         }
 

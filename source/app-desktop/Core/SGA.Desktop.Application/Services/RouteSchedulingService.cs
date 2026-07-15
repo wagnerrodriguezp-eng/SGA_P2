@@ -124,6 +124,45 @@ public class RouteSchedulingService
         return OperationResult<Stop>.Success(stop);
     }
 
+    public async Task<OperationResult<Stop>> UpdateStopAsync(Guid routeId, Guid id, UpdateStopDto dto, CancellationToken ct = default)
+    {
+        var notifications = await _validator.ValidateStopForUpdateAsync(id, dto, ct);
+        if (notifications.HasNotifications)
+        {
+            return OperationResult<Stop>.Failure(
+                OperationResultStatus.ValidationError, notifications.Notifications.Select(n => n.Message).ToArray());
+        }
+
+        var stop = await _stops.GetByIdAsync(id, ct);
+        if (stop is null || stop.RouteId != routeId)
+        {
+            return OperationResult<Stop>.Failure(OperationResultStatus.NotFound, "Stop not found.");
+        }
+
+        stop.Name = dto.Name;
+        stop.Order = dto.Order;
+        stop.StopStatus = dto.StopStatus;
+        await _stops.UpdateAsync(stop, ct);
+        await _stops.SaveChangesAsync(ct);
+
+        await _auditWriter.WriteAsync("Stop.Update", nameof(Stop), stop.Id.ToString(), null, null, ct);
+        return OperationResult<Stop>.Success(stop);
+    }
+
+    public async Task<OperationResult> DeactivateStopAsync(Guid routeId, Guid id, CancellationToken ct = default)
+    {
+        var stop = await _stops.GetByIdAsync(id, ct);
+        if (stop is null || stop.RouteId != routeId)
+        {
+            return OperationResult.Failure(OperationResultStatus.NotFound, "Stop not found.");
+        }
+
+        await _stops.DeactivateAsync(id, ct);
+        await _stops.SaveChangesAsync(ct);
+        await _auditWriter.WriteAsync("Stop.Deactivate", nameof(Stop), id.ToString(), null, null, ct);
+        return OperationResult.Success("Stop deactivated.");
+    }
+
     public async Task<OperationResult<Schedule>> CreateScheduleAsync(CreateScheduleDto dto, CancellationToken ct = default)
     {
         var notifications = await _validator.ValidateScheduleForCreateAsync(dto, ct);

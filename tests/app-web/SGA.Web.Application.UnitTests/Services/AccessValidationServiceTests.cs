@@ -46,7 +46,7 @@ public class AccessValidationServiceTests
     }
 
     [Fact]
-    public async Task ValidateAndRecordAsync_ConcurrencyConflictOnAllAttempts_ReturnsConflict()
+    public async Task ValidateAndRecordAsync_ConcurrencyConflictOnAllAttempts_RecordsDeniedUsage()
     {
         var (trip, authorization) = NewGrantableScenario();
         var tripRepository = new FakeTripRepository(trip, failuresBeforeSuccess: 3);
@@ -59,8 +59,10 @@ public class AccessValidationServiceTests
 
         var result = await service.ValidateAndRecordAsync(Guid.NewGuid(), trip.Id);
 
-        Assert.False(result.IsSuccess);
-        Assert.Equal(OperationResultStatus.Conflict, result.Status);
+        // Exhausting all retries must still record the attempt — never silently drop it.
+        Assert.True(result.IsSuccess);
+        Assert.Equal(AccessResult.DeniedNoCapacity, result.Data!.AccessResult);
         Assert.Equal(3, tripRepository.SaveChangesCallCount);
+        Assert.Contains("Access.Denied", auditWriter.Actions);
     }
 }

@@ -19,4 +19,7 @@ public class Authorization : BaseEntity<Guid>
     // Used by RechargeableCard only — remaining trip count.
     public int? Balance { get; set; }
     public DateTime IssuedAtUtc { get; set; }
+
+    // Backs optimistic-concurrency protection on Balance decrements (see AccessValidationService).
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 }

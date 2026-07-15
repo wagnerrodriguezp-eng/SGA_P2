@@ -48,6 +48,14 @@ public class RoutesController : ApiControllerBase
         return FromResult(await _routeSchedulingService.CreateStopAsync(dto, ct));
     }
 
+    [HttpPut("{id:guid}/stops/{stopId:guid}")]
+    public async Task<IActionResult> UpdateStop(Guid id, Guid stopId, [FromBody] UpdateStopDto dto, CancellationToken ct) =>
+        FromResult(await _routeSchedulingService.UpdateStopAsync(id, stopId, dto, ct));
+
+    [HttpPost("{id:guid}/stops/{stopId:guid}/deactivate")]
+    public async Task<IActionResult> DeactivateStop(Guid id, Guid stopId, CancellationToken ct) =>
+        FromResult(await _routeSchedulingService.DeactivateStopAsync(id, stopId, ct));
+
     [HttpGet("{id:guid}/schedules")]
     public async Task<IActionResult> GetSchedules(Guid id, CancellationToken ct)
     {

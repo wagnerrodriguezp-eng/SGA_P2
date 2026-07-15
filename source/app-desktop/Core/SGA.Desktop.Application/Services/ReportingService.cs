@@ -1,3 +1,4 @@
+using SGA.SharedKernel.Domain.Entities;
 using SGA.Desktop.Application.Persistence;
 using SGA.Desktop.Application.Reporting;
 using SGA.Desktop.Domain.Dtos;
@@ -24,4 +25,7 @@ public class ReportingService
 
     public Task<RevenueReportResult> GetRevenueReportAsync(ReportFilterDto filter, CancellationToken ct = default) =>
         _reportingRepository.GetRevenueReportAsync(filter, ct);
+
+    public Task<IReadOnlyList<UsageRecord>> GetUsageRecordsAsync(ReportFilterDto filter, CancellationToken ct = default) =>
+        _reportingRepository.GetUsageRecordsAsync(filter, ct);
 }

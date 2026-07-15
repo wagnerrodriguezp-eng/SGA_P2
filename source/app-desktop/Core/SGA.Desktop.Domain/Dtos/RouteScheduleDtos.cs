@@ -36,6 +36,18 @@ public class CreateStopDto
     public int Order { get; set; }
 }
 
+public class UpdateStopDto
+{
+    [Required, MaxLength(100)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    public int Order { get; set; }
+
+    [Required]
+    public StopStatus StopStatus { get; set; }
+}
+
 public class CreateScheduleDto
 {
     [Required]

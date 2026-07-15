@@ -18,6 +18,10 @@ public class ReportsController : ApiControllerBase
     public async Task<IActionResult> Usage([FromQuery] ReportFilterDto filter, CancellationToken ct) =>
         Ok(OperationResult<object>.Success(await _reportingService.GetUsageReportAsync(filter, ct)));
 
+    [HttpGet("usage/records")]
+    public async Task<IActionResult> UsageRecords([FromQuery] ReportFilterDto filter, CancellationToken ct) =>
+        Ok(OperationResult<object>.Success(await _reportingService.GetUsageRecordsAsync(filter, ct)));
+
     [HttpGet("occupancy")]
     public async Task<IActionResult> Occupancy([FromQuery] ReportFilterDto filter, CancellationToken ct) =>
         Ok(OperationResult<object>.Success(await _reportingService.GetOccupancyReportAsync(filter, ct)));

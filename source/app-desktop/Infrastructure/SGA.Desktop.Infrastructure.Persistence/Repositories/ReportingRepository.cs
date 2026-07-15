@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SGA.SharedKernel.Domain.Entities;
 using SGA.SharedKernel.Domain.Enums;
 using SGA.Desktop.Application.Persistence;
 using SGA.Desktop.Application.Reporting;
@@ -95,6 +96,15 @@ public class ReportingRepository : IReportingRepository
         return new RevenueReportResult(
             authorizations.Count(a => a == AuthorizationType.MonthlyTicket),
             authorizations.Count(a => a == AuthorizationType.RechargeableCard));
+    }
+
+    public async Task<IReadOnlyList<UsageRecord>> GetUsageRecordsAsync(ReportFilterDto filter, CancellationToken ct = default)
+    {
+        var tripIds = await GetTripIdsInRangeAsync(filter, ct);
+        return await _context.UsageRecords
+            .Where(u => tripIds.Contains(u.TripId))
+            .OrderByDescending(u => u.UsedAtUtc)
+            .ToListAsync(ct);
     }
 
     private async Task<List<Guid>> GetTripIdsInRangeAsync(ReportFilterDto filter, CancellationToken ct)

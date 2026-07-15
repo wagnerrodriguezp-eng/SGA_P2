@@ -25,6 +25,7 @@ public static class PersistenceDependencies
         services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         services.AddScoped<ITripRepository, TripRepository>();
         services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
+        services.AddScoped<IIncidentRepository, IncidentRepository>();
         services.AddScoped<IIdentityGateway, IdentityGatewayAdapter>();
 
         return services;

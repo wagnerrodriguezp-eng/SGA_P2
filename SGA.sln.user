@@ -1,0 +1,5 @@
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MultiStartupProjects>SGA.Web.Api;SGA.Web.Mvc;SGA.Desktop.Api;SGA.Desktop.Wpf</MultiStartupProjects>
+  </PropertyGroup>
+</Project>

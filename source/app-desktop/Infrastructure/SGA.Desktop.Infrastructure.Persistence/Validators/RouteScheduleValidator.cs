@@ -44,6 +44,24 @@ public class RouteScheduleValidator : IRouteScheduleValidator
         return notifications;
     }
 
+    public async Task<NotificationContext> ValidateStopForUpdateAsync(Guid stopId, UpdateStopDto dto, CancellationToken ct = default)
+    {
+        var notifications = new NotificationContext();
+        var stop = await _context.Stops.FindAsync(new object?[] { stopId }, ct);
+        if (stop is null)
+        {
+            notifications.AddNotification("NotFound", "Stop not found.");
+            return notifications;
+        }
+
+        if (await _context.Stops.AnyAsync(s => s.RouteId == stop.RouteId && s.Order == dto.Order && s.Id != stopId, ct))
+        {
+            notifications.AddNotification("Order", "A stop with this order already exists on this route.");
+        }
+
+        return notifications;
+    }
+
     public async Task<NotificationContext> ValidateScheduleForCreateAsync(CreateScheduleDto dto, CancellationToken ct = default)
     {
         var notifications = new NotificationContext();

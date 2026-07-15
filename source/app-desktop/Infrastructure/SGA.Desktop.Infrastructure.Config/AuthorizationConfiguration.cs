@@ -12,5 +12,6 @@ public class AuthorizationConfiguration : IEntityTypeConfiguration<Authorization
         builder.ConfigureBaseEntity();
         builder.Property(a => a.AuthorizationType).HasConversion<int>();
         builder.Property(a => a.AuthorizationStatus).HasConversion<int>();
+        builder.Property(a => a.RowVersion).IsRowVersion();
     }
 }

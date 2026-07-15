@@ -26,6 +26,7 @@ public static class PersistenceDependencies
         services.AddScoped<IBusRepository, BusRepository>();
         services.AddScoped<ITripRepository, TripRepository>();
         services.AddScoped<IReportingRepository, ReportingRepository>();
+        services.AddScoped<IIncidentRepository, IncidentRepository>();
         services.AddScoped<IIdentityGateway, IdentityGatewayAdapter>();
 
         return services;

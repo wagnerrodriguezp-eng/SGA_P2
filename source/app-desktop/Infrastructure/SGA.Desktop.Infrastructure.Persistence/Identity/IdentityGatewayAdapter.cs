@@ -6,6 +6,7 @@ using SGA.Identity.Services;
 using SGA.SharedKernel.Application.Persistence;
 using SGA.SharedKernel.Application.Results;
 using SGA.SharedKernel.Domain.Entities;
+using SGA.SharedKernel.Domain.Enums;
 using SGA.Desktop.Application.Identity;
 
 namespace SGA.Desktop.Infrastructure.Persistence.Identity;
@@ -17,10 +18,12 @@ public class IdentityGatewayAdapter : IIdentityGateway
 {
     private static readonly string[] AllowedLoginRoles = { RoleNames.TransportAdmin };
     private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
+    private const string GenericRefreshFailureMessage = "Invalid or expired refresh token.";
 
     private readonly IAccountService _accountService;
     private readonly ITokenService _tokenService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IApplicationAffinityChecker _affinityChecker;
     private readonly IGenericRepository<RefreshToken, Guid> _refreshTokens;
     private readonly DesktopAppDbContext _context;
 
@@ -28,12 +31,14 @@ public class IdentityGatewayAdapter : IIdentityGateway
         IAccountService accountService,
         ITokenService tokenService,
         UserManager<ApplicationUser> userManager,
+        IApplicationAffinityChecker affinityChecker,
         IGenericRepository<RefreshToken, Guid> refreshTokens,
         DesktopAppDbContext context)
     {
         _accountService = accountService;
         _tokenService = tokenService;
         _userManager = userManager;
+        _affinityChecker = affinityChecker;
         _refreshTokens = refreshTokens;
         _context = context;
     }
@@ -55,16 +60,21 @@ public class IdentityGatewayAdapter : IIdentityGateway
         var existing = await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token == refreshToken, ct);
         if (existing is null || existing.RevokedAtUtc is not null || existing.ExpiresAtUtc < DateTime.UtcNow)
         {
-            return OperationResult<TokenPairResult>.Failure(OperationResultStatus.Unauthorized, "Invalid or expired refresh token.");
+            return OperationResult<TokenPairResult>.Failure(OperationResultStatus.Unauthorized, GenericRefreshFailureMessage);
         }
 
         var user = await _userManager.FindByIdAsync(existing.UserId.ToString());
-        if (user is null)
+        if (user is null || user.RecordStatus != RecordStatus.Active || await _userManager.IsLockedOutAsync(user))
         {
-            return OperationResult<TokenPairResult>.Failure(OperationResultStatus.Unauthorized, "Invalid or expired refresh token.");
+            return OperationResult<TokenPairResult>.Failure(OperationResultStatus.Unauthorized, GenericRefreshFailureMessage);
         }
 
         var roles = (IReadOnlyCollection<string>)await _userManager.GetRolesAsync(user);
+        if (!_affinityChecker.IsAllowed(roles))
+        {
+            return OperationResult<TokenPairResult>.Failure(OperationResultStatus.Unauthorized, GenericRefreshFailureMessage);
+        }
+
         var newAccessToken = _tokenService.CreateAccessToken(user, roles);
 
         var newRefreshValue = GenerateSecureToken();
@@ -80,7 +90,16 @@ public class IdentityGatewayAdapter : IIdentityGateway
             ExpiresAtUtc = DateTime.UtcNow.Add(RefreshTokenLifetime)
         };
         await _refreshTokens.AddAsync(newRefreshToken, ct);
-        await _refreshTokens.SaveChangesAsync(ct);
+
+        try
+        {
+            await _refreshTokens.SaveChangesAsync(ct);
+        }
+        catch (ConcurrencyConflictException)
+        {
+            // Another request rotated this same token first — treat it as already used.
+            return OperationResult<TokenPairResult>.Failure(OperationResultStatus.Unauthorized, GenericRefreshFailureMessage);
+        }
 
         return OperationResult<TokenPairResult>.Success(
             new TokenPairResult(newAccessToken.Token, newAccessToken.ExpiresAtUtc, newRefreshValue));
